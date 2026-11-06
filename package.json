@@ -1,0 +1,23 @@
+{
+  "name": "licores-palmira-gestion",
+  "version": "1.0.0",
+  "description": "Licores Palmira · Panel de gestión. Monorepo: backend (Express + SQLite) y frontend (React + TypeScript + Vite).",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": { "node": ">=22.13.0" },
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build": "npm run build -w frontend",
+    "start": "npm start -w backend",
+    "test": "npm test -w backend",
+    "typecheck": "npm run typecheck -w frontend",
+    "seed": "npm run seed -w backend --",
+    "db:init": "npm run db:init -w backend",
+    "crear-admin": "npm run crear-admin -w backend --",
+    "backup": "npm run backup -w backend",
+    "check": "npm run check -w backend"
+  }
+}

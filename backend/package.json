@@ -1,0 +1,30 @@
+{
+  "name": "@palmira/backend",
+  "version": "1.0.0",
+  "description": "Licores Palmira · API REST (Express 5 + SQLite integrado). Sirve también el build de producción del frontend.",
+  "main": "server/index.js",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "db:init": "node --disable-warning=ExperimentalWarning scripts/db-init.js",
+    "crear-admin": "node --disable-warning=ExperimentalWarning scripts/crear-admin.js",
+    "seed": "node --disable-warning=ExperimentalWarning server/seed.js",
+    "backup": "node --disable-warning=ExperimentalWarning scripts/backup.js",
+    "check": "node --disable-warning=ExperimentalWarning scripts/verificar-entorno.js",
+    "test": "node --disable-warning=ExperimentalWarning --test --test-concurrency=1 \"tests/**/*.test.js\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0",
+    "bcryptjs": "3.0.3",
+    "express": "5.3.0",
+    "express-rate-limit": "8.7.1",
+    "helmet": "8.3.0",
+    "pdfkit": "0.20.2",
+    "zod": "^4.6.7"
+  }
+}

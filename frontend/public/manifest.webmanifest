@@ -1,0 +1,22 @@
+{
+  "name": "Licores Palmira · Panel de gestión",
+  "short_name": "Palmira",
+  "description": "Panel de gestión de Licores Palmira: ventas al detal y al por mayor, domicilios, inventario por lotes, compras, créditos, caja, contabilidad y reportes.",
+  "start_url": "/#/inicio",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#110e0b",
+  "theme_color": "#110e0b",
+  "lang": "es",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Vender", "url": "/#/vender", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Nuevo domicilio", "url": "/#/domicilios/nuevo", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Registrar compra", "url": "/#/compras/nueva", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

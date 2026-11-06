@@ -1,0 +1,160 @@
+/* Asistente Tino: botón flotante con la mascota, burbuja de invitación y panel de conversación. Usa los tokens de app.css.
+   Capas: por debajo de los modales (.modal-fondo = 100) y de los avisos (200), por encima de la barra inferior (30). */
+.tino { position: fixed; right: 16px; bottom: 16px; z-index: 60; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; font-family: var(--font); }
+/* El contenedor fijo no captura clics: solo sus piezas visibles (mascota, burbuja, oreja y panel). */
+.tino { pointer-events: none; }
+.tino > * { pointer-events: auto; }
+.tino :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---- Estado cerrado: mascota + tarjeta de invitación + botón ---- */
+.tino-cerrado { display: flex; align-items: flex-end; gap: 10px; }
+.tino-mascota { height: 104px; width: auto; border: 0; padding: 0; background: transparent; cursor: pointer; filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6)); transition: transform 0.15s; }
+.tino-mascota img { height: 100%; width: auto; }
+.tino-mascota:hover { transform: translateY(-3px); }
+.tino-lado { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.tino-burbuja { position: relative; background: var(--bg); border: 1px solid var(--line-2); border-radius: 12px; padding: 10px 32px 10px 12px; max-width: 236px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); animation: tino-fade 0.25s; }
+.tino-burbuja b { display: block; font-size: 13px; }
+.tino-burbuja p { font-size: 12px; color: var(--ink-2); margin-top: 2px; line-height: 1.35; }
+.tino-burbuja-x { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; color: var(--ink-3); cursor: pointer; display: grid; place-items: center; }
+.tino-burbuja-x:hover { background: var(--bg-2); color: var(--ink); }
+.tino-abrir { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: var(--r-pill); border: 1px solid var(--accent); background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 8px 24px rgba(254, 177, 64, 0.3); white-space: nowrap; transition: background 0.12s; }
+.tino-abrir:hover { background: var(--accent-hover); }
+.tino-abrir svg { width: 18px; height: 18px; }
+
+/* Auto-ocultar: la mascota y la tarjeta se desvanecen deslizándose a la derecha; ocultas quedan fuera del foco
+   (visibility:hidden) y de los clics. La oreja siempre queda a la vista para volver a mostrarlas. */
+.tino-cerrado .tino-mascota, .tino-cerrado .tino-lado { transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear; }
+.tino-cerrado.oculto .tino-mascota, .tino-cerrado.oculto .tino-lado { opacity: 0; transform: translateX(18px); visibility: hidden; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease, visibility 0s linear 0.25s; }
+.tino-oreja { position: relative; flex-shrink: 0; align-self: center; width: 52px; height: 52px; border: 0; background: transparent; padding: 0; cursor: pointer; transition: transform 0.15s; }
+/* La oreja solo se ve cuando el bloque está recogido: con la mascota completa a la vista se omite. */
+.tino-cerrado:not(.oculto) .tino-oreja { display: none; }
+/* Oculto, el contenedor no debe tapar los botones de la página que quedan detrás: solo la oreja recibe clics. */
+.tino-cerrado.oculto { pointer-events: none; }
+.tino-cerrado.oculto .tino-oreja { pointer-events: auto; }
+.tino-oreja img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5)); }
+.tino-oreja:hover { transform: translateY(-2px) scale(1.05); }
+
+/* ---- Panel abierto (escritorio: tarjeta flotante anclada abajo a la derecha) ---- */
+.tino-panel { width: 400px; max-width: calc(100vw - 32px); height: min(640px, calc(100vh - 32px)); background: var(--bg); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: 0 24px 64px rgba(0, 0, 0, 0.65); display: flex; flex-direction: column; overflow: hidden; animation: tino-subir 0.2s ease-out; }
+.tino-cab { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg); }
+.tino-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--bg-2); object-fit: cover; object-position: top; flex-shrink: 0; }
+.tino-avatar.chico { width: 26px; height: 26px; margin-top: 2px; }
+.tino-titulo { flex: 1; min-width: 0; line-height: 1.2; }
+.tino-titulo b { display: block; font-size: 15px; }
+.tino-titulo small { display: block; font-size: 12px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tino-estado i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); margin-right: 4px; vertical-align: 1px; }
+.tino-estado.ok i { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft); }
+.tino-cab .btn.icono.chico { border-color: transparent; }
+
+.tino-mensajes { position: relative; flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+.tino-msg { display: flex; gap: 8px; max-width: 94%; }
+.tino-msg > div { min-width: 0; }
+.tino-msg.usuario { align-self: flex-end; flex-direction: row-reverse; }
+.tino-globo { background: var(--bg-input); border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.tino-msg.usuario .tino-globo { background: var(--bg-2); border-color: transparent; border-bottom-right-radius: 4px; }
+.tino-msg.asistente .tino-globo { border-bottom-left-radius: 4px; }
+.tino-globo ul { margin: 6px 0 2px 18px; padding: 0; }
+.tino-globo li { margin: 2px 0; }
+.tino-globo b { color: var(--ink); }
+.tino-hora { font-size: 11px; color: var(--ink-3); margin-top: 3px; padding: 0 4px; }
+.tino-msg.usuario .tino-hora { text-align: right; }
+.tino-accion { margin-top: 8px; }
+.tino-accion .btn { gap: 6px; }
+.tino-chips { display: flex; flex-wrap: wrap; gap: 6px; padding-left: 34px; }
+.tino-chip { border: 1px solid var(--line-2); background: transparent; color: var(--ink); border-radius: var(--r-pill); padding: 7px 12px; font-size: 13px; cursor: pointer; text-align: left; transition: border-color 0.12s, background 0.12s; }
+.tino-chip:hover { border-color: var(--accent); background: var(--accent-soft); }
+.tino-pensando { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 13px; }
+.tino-pensando i { font-style: normal; animation: tino-punto 1.2s infinite; }
+.tino-pensando i:nth-child(2) { animation-delay: 0.2s; }
+.tino-pensando i:nth-child(3) { animation-delay: 0.4s; }
+.tino-error { background: var(--danger-soft); border: 1px solid var(--danger-line); color: #ffc0c2; border-radius: 12px; padding: 10px 12px; font-size: 13px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.tino-aviso { font-size: 13px; }
+.tino-aviso a { color: inherit; text-decoration: underline; }
+
+/* Historial de conversaciones (reemplaza la lista de mensajes dentro del panel) */
+.tino-hist-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.tino-hist-item { flex: 1; min-width: 0; text-align: left; background: transparent; border: 0; padding: 0; color: inherit; cursor: pointer; }
+.tino-hist-item .titulo { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tino-hist-item .sub { color: var(--ink-2); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Pie: transcripción en vivo, entrada, micrófono, enviar y opciones */
+.tino-pie { border-top: 1px solid var(--line); padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; background: var(--bg); }
+.tino-transcripcion { font-size: 12px; color: var(--ink-2); font-style: italic; padding: 0 4px; }
+.tino-entrada { display: flex; gap: 8px; align-items: flex-end; }
+.tino-texto { flex: 1; min-height: 42px; max-height: 118px; resize: none; line-height: 1.4; padding-top: 10px; }
+.tino-entrada .btn.icono { flex-shrink: 0; }
+.tino-entrada .btn.icono.grabando { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); animation: tino-pulso 1.2s infinite; }
+.tino-opciones { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); flex-wrap: wrap; }
+.tino-leer { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500; }
+.tino-leer input { width: 16px; height: 16px; accent-color: var(--accent); margin: 0; }
+.tino-pista { white-space: nowrap; }
+
+/* ---- Avisos: contador sobre la mascota, burbuja de alerta y tarjeta de pendientes ----
+   Nivel alta = rojo Palmira (urgente), media = naranja (pronto), info = gris. El número siempre acompaña al color. */
+.tino-mascota { position: relative; }
+.tino-contador { position: absolute; top: 6px; right: -2px; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--warn); color: #1a1200; font-size: 12px; font-weight: 800; line-height: 22px; text-align: center; box-shadow: 0 0 0 2px var(--bg-app); pointer-events: none; }
+.tino-contador.alta { background: var(--lp-rojo); color: #fff; }
+.tino-mascota.avisando { animation: tino-avisar 0.9s ease-in-out 2; }
+.tino-burbuja.alerta { padding: 0; border-left: 3px solid var(--warn); }
+.tino-burbuja.alerta.alta { border-left-color: var(--accent); }
+.tino-burbuja-cuerpo { display: block; width: 100%; text-align: left; background: transparent; border: 0; color: inherit; font: inherit; padding: 10px 32px 10px 12px; cursor: pointer; border-radius: 12px; }
+.tino-burbuja-cuerpo p span { color: var(--ink-2); }
+.tino-nuevo { display: inline-block; padding: 0 6px; margin-right: 2px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-ink); font-size: 11px; font-weight: 800; vertical-align: 1px; }
+.tino-burbuja-ver { display: inline-block; margin-top: 6px; font-size: 12px; font-weight: 700; color: var(--accent-ink); }
+.tino-burbuja-cuerpo:hover .tino-nuevo { display: inline-block; padding: 0 6px; margin-right: 2px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-ink); font-size: 11px; font-weight: 800; vertical-align: 1px; }
+.tino-burbuja-ver { text-decoration: underline; }
+
+.tino-pend { position: relative; }
+.tino-pend-n { position: absolute; top: 2px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--lp-rojo); color: #fff; font-size: 10px; font-weight: 800; line-height: 16px; text-align: center; pointer-events: none; }
+
+.tino-pend-cab { margin: 10px 0 6px; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.tino-pend-cab.ok { color: var(--ok); font-weight: 600; }
+.tino-avisos { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.tino-pend-cab + .tino-avisos { margin-top: 0; }
+.tino-aviso { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 8px; padding: 8px 8px 8px 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: inherit; text-decoration: none; transition: border-color 0.12s, background 0.12s; }
+a.tino-aviso:hover { border-color: var(--line-2); background: var(--bg-2); }
+.tino-aviso-ico { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--bg-2); color: var(--ink-2); }
+.tino-aviso.alta .tino-aviso-ico { background: var(--accent-soft); color: var(--accent-ink); }
+.tino-aviso.media .tino-aviso-ico { background: var(--warn-soft); color: var(--warn); }
+.tino-aviso-txt { min-width: 0; line-height: 1.3; }
+.tino-aviso-txt b { display: block; font-size: 13px; }
+.tino-aviso-txt small { display: block; font-size: 12px; color: var(--ink-2); overflow-wrap: anywhere; }
+.tino-aviso-ir { color: var(--ink-3); display: grid; place-items: center; }
+.tino-globo ol { margin: 6px 0 2px 22px; padding: 0; }
+.tino-sub { color: var(--ink-2); font-size: 12px; }
+.tino-accion { display: flex; flex-wrap: wrap; gap: 6px; }
+.tino-casillas { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+
+/* ---- Celular: versión compacta cerrada y hoja a pantalla completa abierta ---- */
+@media (max-width: 899px) {
+  .tino { right: 12px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px); }
+  /* En Vender la barra de cobro va pegada a la barra inferior: la mascota sube para no taparla. */
+  body:has(.barra-cobro) .tino { bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 80px); }
+}
+@media (max-width: 699px) {
+  .tino-mascota { height: 64px; }
+  .tino-burbuja { display: none; }
+  /* En el celular solo aparece la burbuja cuando hay un aviso nuevo; la invitación general se omite. */
+  .tino-burbuja.alerta:not([hidden]) { display: block; max-width: 210px; }
+  .tino-burbuja.alerta .tino-burbuja-cuerpo p span { display: none; }
+  .tino-contador { top: 0; right: -4px; }
+  .tino-negocio { display: none; }
+  .tino-abrir { min-height: 40px; padding: 0 14px; font-size: 13px; }
+  .tino-abrir span { display: none; }
+  .tino-abrir::after { content: 'Tino'; }
+  .tino-oreja { width: 46px; height: 46px; }
+  .tino-panel { position: fixed; inset: 0; width: auto; max-width: none; height: auto; border-radius: 0; border: 0; animation: tino-fade 0.15s; }
+  .tino-cab { padding-top: calc(10px + env(safe-area-inset-top)); }
+  .tino-pista { display: none; }
+}
+
+@keyframes tino-subir { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes tino-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tino-punto { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
+@keyframes tino-avisar { 0%, 100% { transform: none; } 25% { transform: translateY(-6px) rotate(-4deg); } 50% { transform: none; } 75% { transform: translateY(-3px) rotate(3deg); } }
+@keyframes tino-pulso { 0%, 100% { box-shadow: 0 0 0 0 rgba(254, 177, 64, 0.4); } 50% { box-shadow: 0 0 0 6px rgba(254, 177, 64, 0); } }
+@media (prefers-reduced-motion: reduce) {
+  .tino *, .tino-panel, .tino-burbuja, .tino-mascota { animation: none !important; transition: none !important; }
+  .tino-mensajes { scroll-behavior: auto; }
+}
+@media print { .tino { display: none !important; } }
